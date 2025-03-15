@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yüz Efekti Eşleştirme Oyunu</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .game-container {
+            text-align: center;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .game-images {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .game-image {
+            font-size: 3rem;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            background-color: #222;
+            color: transparent;
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+        .game-image.revealed {
+            color: white;
+            background-color: #f39c12;
+        }
+        .start-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .start-btn:hover {
+            background-color: #c0392b;
+        }
+        .score {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Yüz Efekti Eşleştirme Oyunu</h1>
+        <button class="start-btn" onclick="startGame()">Oyunu Başlat</button>
+        <div class="score" id="score">Skor: 0</div>
+        <div class="game-images" id="gameImages"></div>
+    </div>
+
+    <script>
+        const faces = ["😊", "😞", "😡", "😮", "😎", "😜", "😇", "😈"];
+        let selectedFaces = [];
+        let score = 0;
+        let gameStarted = false;
+
+        function startGame() {
+            score = 0;
+            gameStarted = true;
+            updateScore();
+            selectedFaces = [];
+            shuffleFaces();
+            displayFaces();
+        }
+
+        function shuffleFaces() {
+            const shuffled = [...faces, ...faces].sort(() => Math.random() - 0.5);
+            window.shuffledFaces = shuffled;
+        }
+
+        function displayFaces() {
+            const gameImagesContainer = document.getElementById("gameImages");
+            gameImagesContainer.innerHTML = '';
+            
+            shuffledFaces.forEach((face, index) => {
+                const faceElement = document.createElement("div");
+                faceElement.textContent = face;
+                faceElement.className = "game-image";
+                faceElement.setAttribute("data-index", index);
+                faceElement.onclick = () => handleFaceClick(faceElement, face);
+                gameImagesContainer.appendChild(faceElement);
+            });
+        }
+
+        function handleFaceClick(faceElement, face) {
+            if (!gameStarted || faceElement.classList.contains("revealed")) return;
+            
+            faceElement.classList.add("revealed");
+            faceElement.textContent = face;
+            selectedFaces.push(faceElement);
+
+            if (selectedFaces.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [firstFace, secondFace] = selectedFaces;
+
+            if (firstFace.textContent === secondFace.textContent) {
+                score += 10;
+                updateScore();
+                resetSelection();
+            } else {
+                setTimeout(() => {
+                    firstFace.classList.remove("revealed");
+                    secondFace.classList.remove("revealed");
+                    firstFace.textContent = "";
+                    secondFace.textContent = "";
+                    resetSelection();
+                }, 1000);
+            }
+        }
+
+        function resetSelection() {
+            selectedFaces = [];
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = `Skor: ${score}`;
+        }
+    </script>
+
+</body>
+</html>
